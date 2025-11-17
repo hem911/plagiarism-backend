@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from utils.google_search import google_search
 from utils.similarity import calculate_similarity, split_into_chunks
@@ -10,9 +11,23 @@ app = FastAPI(
     description="Backend API for AI Plagiarism Detection"
 )
 
+# ---------------------------
+# 🔥 FIX #1: ENABLE CORS
+# ---------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],          # Allow frontend on any domain
+    allow_credentials=True,
+    allow_methods=["*"],          # Allow all methods: POST, GET, etc.
+    allow_headers=["*"],
+)
+
 class CheckRequest(BaseModel):
     text: str
 
+# ---------------------------
+# 🔥 FIX #2: POST Endpoint
+# ---------------------------
 @app.post("/api/check")
 async def check_plagiarism(req: CheckRequest):
     text = req.text.strip()
